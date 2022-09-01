@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/gocelery/gocelery"
+	"github.com/wahello/gocelery.v3"
 )
 
 // exampleAddTask is integer addition task
@@ -65,7 +65,6 @@ func main() {
 	// initialize celery client
 	cli, _ := gocelery.NewCeleryClient(
 		gocelery.NewRedisBroker(&ctx, redisClient),
-		// &gocelery.RedisCeleryBackend{RedisClient: redisClient},
 		gocelery.NewRedisBackend(&ctx, redisClient),
 		5, // number of workers
 	)

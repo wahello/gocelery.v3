@@ -22,7 +22,6 @@ func Example_workerWithContext() {
 	// initialize celery client
 	cli, _ := NewCeleryClient(
 		NewRedisBroker(&ctx, redisClient),
-		// &RedisCeleryBackend{RedisClient: redisClient},
 		NewRedisBackend(&ctx, redisClient),
 		1,
 	)

@@ -13,7 +13,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/gocelery/gocelery"
+	"github.com/wahello/gocelery.v3"
 )
 
 // Run Celery Worker First!
@@ -32,7 +32,6 @@ func main() {
 	cli, _ := gocelery.NewCeleryClient(
 		gocelery.NewRedisBroker(&ctx, redisClient),
 		gocelery.NewRedisBackend(&ctx, redisClient),
-		// &gocelery.RedisCeleryBackend{RedisClient: redisClient},
 		1,
 	)
 

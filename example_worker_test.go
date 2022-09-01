@@ -23,7 +23,6 @@ func Example_worker() {
 	// initialize celery client
 	cli, _ := NewCeleryClient(
 		NewRedisBroker(&ctx, redisClient),
-		// &RedisCeleryBackend{RedisClient: redisClient},
 		NewRedisBackend(&ctx, redisClient),
 		5, // number of workers
 	)
