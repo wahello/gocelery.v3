@@ -109,14 +109,11 @@ func (cm *CeleryMessage) GetTaskMessage() *TaskMessage {
 	}
 	// decode body
 	taskMessage, err := DecodeTaskMessage(cm.Body)
-	log.Println(" ==== ---- ", err)
 
 	if err != nil {
 		log.Println("failed to decode task message")
 		return nil
 	}
-
-	log.Println(" ==== ---- ", taskMessage)
 
 	return taskMessage
 }
