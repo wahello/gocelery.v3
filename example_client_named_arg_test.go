@@ -25,7 +25,7 @@ func Example_clientWithNamedArguments() {
 	ctx := context.Background()
 	// initialize celery client
 	cli, _ := NewCeleryClient(
-		NewRedisBroker(&ctx, redisClient),
+		NewRedisBroker(&ctx, "celery1", redisClient),
 		NewRedisBackend(&ctx, redisClient),
 		1,
 	)

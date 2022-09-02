@@ -27,10 +27,11 @@ func main() {
 		DB:    3,
 	})
 	ctx := context.Background()
+	qname := "inpman"
 
 	// initialize celery client
 	cli, _ := gocelery.NewCeleryClient(
-		gocelery.NewRedisBroker(&ctx, redisClient),
+		gocelery.NewRedisBroker(&ctx, qname, redisClient),
 		gocelery.NewRedisBackend(&ctx, redisClient),
 		1,
 	)

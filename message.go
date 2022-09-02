@@ -44,8 +44,8 @@ var celeryMessagePool = sync.Pool{
 				ReplyTo:       uuid.Must(uuid.NewV4()).String(),
 				DeliveryInfo: CeleryDeliveryInfo{
 					Priority:   0,
-					RoutingKey: "celery",
-					Exchange:   "celery",
+					RoutingKey: "",
+					Exchange:   "",
 				},
 				DeliveryMode: 2,
 				DeliveryTag:  uuid.Must(uuid.NewV4()).String(),
@@ -55,9 +55,11 @@ var celeryMessagePool = sync.Pool{
 	},
 }
 
-func getCeleryMessage(encodedTaskMessage string) *CeleryMessage {
+func getCeleryMessage(qname string, encodedTaskMessage string) *CeleryMessage {
 	msg := celeryMessagePool.Get().(*CeleryMessage)
 	msg.Body = encodedTaskMessage
+	msg.Properties.DeliveryInfo.RoutingKey = qname
+	msg.Properties.DeliveryInfo.Exchange = qname
 	return msg
 }
 
@@ -85,14 +87,6 @@ type CeleryDeliveryInfo struct {
 
 // GetTaskMessage retrieve and decode task messages from broker
 func (cm *CeleryMessage) GetTaskMessage() *TaskMessage {
-	// ensure content-type is 'application/json'
-	// {"body":"eyJpZCI6ImU3NmRkYzczLTMxMGUtNGM3Zi1iM2MxLTEwMTYwZjExNmU5ZCIsInRhc2siOiJ3b3JrZXIuYWRkIiwiYXJncyI6WzEsN10sImt3YXJncyI6e30sInJldHJpZXMiOjAsImV0YSI6bnVsbCwiZXhwaXJlcyI6bnVsbH0=",
-	// "content-type":"application/json",
-	// "properties":{"body_encoding":"base64","correlation_id":"23dd6712-d82d-4f98-b43b-602dbaeb4c8b","reply_to":"d5356431-ca23-4806-8c00-93dcb8dd6efa",
-	// "delivery_info":{"priority":0,"routing_key":"celery","exchange":"celery"},
-	// "delivery_mode":2,
-	// "delivery_tag":"34816688-c4c9-4b7f-ba7f-6eeeef1745a6"},
-	// "content-encoding":"utf-8"}
 	if cm.ContentType != "application/json" {
 		log.Println("unsupported content type " + cm.ContentType)
 		return nil

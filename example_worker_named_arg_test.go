@@ -57,7 +57,7 @@ func Example_workerWithNamedArguments() {
 
 	// initialize celery client
 	cli, _ := NewCeleryClient(
-		NewRedisBroker(&ctx, redisClient),
+		NewRedisBroker(&ctx, "celery1", redisClient),
 		NewRedisBackend(&ctx, redisClient),
 		5, // number of workers
 	)

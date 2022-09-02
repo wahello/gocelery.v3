@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func makeCeleryMessage() (*CeleryMessage, error) {
+func makeCeleryMessage(qname string) (*CeleryMessage, error) {
 	taskMessage := getTaskMessage("add")
 	taskMessage.Args = []interface{}{rand.Intn(10), rand.Intn(10)}
 	defer releaseTaskMessage(taskMessage)
@@ -21,7 +21,7 @@ func makeCeleryMessage() (*CeleryMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return getCeleryMessage(encodedTaskMessage), nil
+	return getCeleryMessage(qname, encodedTaskMessage), nil
 }
 
 // TestBrokerRedisSend is Redis specific test that sets CeleryMessage to queue
@@ -42,7 +42,7 @@ func TestBrokerRedisSend(t *testing.T) {
 	ctx := context.Background()
 
 	for _, tc := range testCases {
-		celeryMessage, err := makeCeleryMessage()
+		celeryMessage, err := makeCeleryMessage(tc.broker.GetQueueName())
 		if err != nil || celeryMessage == nil {
 			t.Errorf("test '%s': failed to construct celery message: %v", tc.name, err)
 			continue
@@ -63,7 +63,7 @@ func TestBrokerRedisSend(t *testing.T) {
 		}
 		messageList := messageJSON.([]interface{})
 		cnt1 := messageList[0].(string)
-		if cnt1 != "celery" {
+		if cnt1 != tc.broker.GetQueueName() {
 			t.Errorf("test '%s': non celery message received", tc.name)
 			releaseCeleryMessage(celeryMessage)
 			continue
@@ -100,7 +100,7 @@ func TestBrokerRedisGet(t *testing.T) {
 	}
 	ctx := context.Background()
 	for _, tc := range testCases {
-		celeryMessage, err := makeCeleryMessage()
+		celeryMessage, err := makeCeleryMessage(tc.broker.GetQueueName())
 		if err != nil || celeryMessage == nil {
 			t.Errorf("test '%s': failed to construct celery message: %v", tc.name, err)
 			continue
@@ -152,7 +152,7 @@ func TestBrokerSendGet(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		celeryMessage, err := makeCeleryMessage()
+		celeryMessage, err := makeCeleryMessage(tc.broker.GetQueueName())
 		if err != nil || celeryMessage == nil {
 			t.Errorf("test '%s': failed to construct celery message: %v", tc.name, err)
 			continue

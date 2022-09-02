@@ -31,8 +31,6 @@ type exampleAddTask struct {
 
 func (a *exampleAddTask) ParseKwargs(kwargs map[string]interface{}) error {
 
-	log.Printf("ParseKwargs kwargs: %v", kwargs)
-
 	kwargA, ok := kwargs["a"]
 	if !ok {
 		return fmt.Errorf("undefined kwarg a")
@@ -69,9 +67,10 @@ func main() {
 		DB:    3,
 	})
 
+	qname := "inpman"
 	// initialize celery client
 	cli, _ := gocelery.NewCeleryClient(
-		gocelery.NewRedisBroker(&ctx, redisClient),
+		gocelery.NewRedisBroker(&ctx, qname, redisClient),
 		gocelery.NewRedisBackend(&ctx, redisClient),
 		5, // number of workers
 	)

@@ -10,6 +10,8 @@ app = Celery(
     backend='redis://localhost:6379/3',
 )
 
+qname = "inpman"
+
 app.conf.update(
     CELERY_TASK_SERIALIZER='json',
     CELERY_ACCEPT_CONTENT=['json'],  # Ignore other content
@@ -19,11 +21,11 @@ app.conf.update(
 )
 
 
-@app.task
+@app.task()
 def add(a, b):
     return a + b
 
 
-@app.task
+@app.task()
 def add_reflect(a, b):
     return a + b

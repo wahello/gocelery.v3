@@ -20,10 +20,10 @@ type RedisCeleryBroker struct {
 }
 
 // NewRedisBroker creates new RedisCeleryBroker with given redis connection pool
-func NewRedisBroker(ctx *context.Context, redisClient redis.UniversalClient) *RedisCeleryBroker {
+func NewRedisBroker(ctx *context.Context, qname string, redisClient redis.UniversalClient) *RedisCeleryBroker {
 	return &RedisCeleryBroker{
 		RedisClient: redisClient,
-		QueueName:   "celery",
+		QueueName:   qname,
 		ctx:         ctx,
 	}
 }
@@ -32,12 +32,16 @@ func NewRedisBroker(ctx *context.Context, redisClient redis.UniversalClient) *Re
 //
 // Deprecated: NewRedisCeleryBroker exists for historical compatibility
 // and should not be used. Use NewRedisBroker instead to create new RedisCeleryBroker.
-func NewRedisCeleryBroker(ctx *context.Context, uri string) *RedisCeleryBroker {
+func NewRedisCeleryBroker(ctx *context.Context, qname string, uri string) *RedisCeleryBroker {
 	return &RedisCeleryBroker{
 		RedisClient: NewRedisClient(uri),
-		QueueName:   "celery",
+		QueueName:   qname,
 		ctx:         ctx,
 	}
+}
+
+func (c *RedisCeleryBroker) GetQueueName() string {
+	return c.QueueName
 }
 
 // SendCeleryMessage sends CeleryMessage to redis queue

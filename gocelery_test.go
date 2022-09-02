@@ -23,13 +23,13 @@ var (
 		Addrs: []string{"localhost:6379"},
 		DB:    0,
 	})
-
+	qname                = "celery1"
 	ctx                  = context.Background()
-	redisBroker          = NewRedisCeleryBroker(&ctx, "redis://localhost:6379/0")
-	redisBrokerWithConn  = NewRedisBroker(&ctx, redisClient)
+	redisBroker          = NewRedisCeleryBroker(&ctx, qname, "redis://localhost:6379/0")
+	redisBrokerWithConn  = NewRedisBroker(&ctx, qname, redisClient)
 	redisBackend         = NewRedisCeleryBackend(&ctx, "redis://localhost:6379/0")
 	redisBackendWithConn = NewRedisBackend(&ctx, redisClient)
-	amqpBroker           = NewAMQPCeleryBroker("amqp://")
+	amqpBroker           = NewAMQPCeleryBroker(qname, "amqp://")
 	amqpBackend          = NewAMQPCeleryBackend("amqp://")
 )
 
