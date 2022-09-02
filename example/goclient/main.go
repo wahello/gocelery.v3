@@ -37,7 +37,6 @@ func main() {
 
 	// prepare arguments
 	taskName := "worker.add"
-	// taskName := "worker.add_reflect"
 	argA := rand.Intn(10)
 	argB := rand.Intn(10)
 	log.Println(" a : ", argA, " b : ", argB)
@@ -55,8 +54,9 @@ func main() {
 	}
 	log.Printf("result: %+v of type %+v", res, reflect.TypeOf(res))
 	time.Sleep(time.Second * 2)
-	//
-	asyncResult1, err1 := cli.DelayKwargs(taskName, map[string]interface{}{
+
+	taskName1 := "worker.add_reflect"
+	asyncResult1, err1 := cli.DelayKwargs(taskName1, map[string]interface{}{
 		"a": argA + 1,
 		"b": argB + 1,
 	})
@@ -65,9 +65,9 @@ func main() {
 		panic(err1)
 	}
 
-	// get results from backend with timeout
+	// // get results from backend with timeout
 	res1, err1 := asyncResult1.Get(10 * time.Second)
-	if err != nil {
+	if err1 != nil {
 		panic(err1)
 	}
 

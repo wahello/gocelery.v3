@@ -7,12 +7,20 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 
 	"github.com/wahello/gocelery.v3"
 )
+
+func add(a, b int) int {
+	return a + b
+}
 
 // exampleAddTask is integer addition task
 // with named arguments
@@ -22,6 +30,9 @@ type exampleAddTask struct {
 }
 
 func (a *exampleAddTask) ParseKwargs(kwargs map[string]interface{}) error {
+
+	log.Printf("ParseKwargs kwargs: %v", kwargs)
+
 	kwargA, ok := kwargs["a"]
 	if !ok {
 		return fmt.Errorf("undefined kwarg a")
@@ -48,10 +59,6 @@ func (a *exampleAddTask) RunTask() (interface{}, error) {
 	return result, nil
 }
 
-func add(a, b int) int {
-	return a + b
-}
-
 func main() {
 
 	// create redis connection pool
@@ -70,15 +77,32 @@ func main() {
 	)
 
 	// register task
-	cli.Register("worker.add_reflect", &exampleAddTask{})
-	cli.Register("worker.add", add)
 
 	// start workers (non-blocking call)
 	cli.StartWorker()
 
+	cli.Register("worker.add", add)
+	cli.Register("worker.add_reflect", &exampleAddTask{})
+
 	// wait for client request
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	// stop workers gracefully (blocking call)
-	cli.StopWorker()
+	cleanFunc := func() { cli.StopWorker() }
+	exitGracefully(cleanFunc)
+}
+
+func exitGracefully(cleanFunc func()) {
+	c := make(chan os.Signal, 1)
+	signal.Reset(syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
+
+	select {
+	case s := <-c:
+		log.Println("receive a signal", s.String())
+
+		cleanFunc()
+
+		os.Exit(0)
+	}
 }
